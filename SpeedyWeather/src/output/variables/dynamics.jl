@@ -223,6 +223,92 @@ end
 
 path(::HumidityOutput, simulation) = simulation.diagnostic_variables.grid.humid_grid
 
+abstract type AbstractTendencyBudgetOutput <: AbstractOutputVariable end
+
+const TENDENCY_BUDGET_VARIABLES = (
+    (:u, "u", "m/s/day", "zonal wind", "ZonalWind"),
+    (:v, "v", "m/s/day", "meridional wind", "MeridionalWind"),
+    (:temp, "temp", "K/day", "temperature", "Temperature"),
+    (:humid, "q", "kg/kg/day", "specific humidity", "Humidity"),
+)
+
+const TENDENCY_BUDGET_TERMS = (
+    (:physics, "phys", "physics", "Physics"),
+    (:dynamics, "dyn", "dynamics", "Dynamics"),
+    (:conv, "conv", "convection", "Convective"),
+    (:bl, "bl", "boundary-layer processes", "BoundaryLayer"),
+    (:vdiff, "vdiff", "vertical diffusion", "VerticalDiffusion"),
+    (:lsc, "lsc", "large-scale condensation", "Condensation"),
+    (:sw, "sw", "shortwave radiation", "Shortwave"),
+    (:lw, "lw", "longwave radiation", "Longwave"),
+    (:smf, "smf", "surface momentum flux", "SurfaceMomentum"),
+    (:shf, "shf", "surface sensible heat flux", "SurfaceSensibleHeat"),
+    (:shuf, "shuf", "surface humidity flux", "SurfaceHumidity"),
+    (:stoch, "stoch", "stochastic physics", "Stochastic"),
+)
+
+const TENDENCY_BUDGET_OUTPUT_SPECS = let specs = Tuple{Symbol, String, String, String, Symbol}[]
+    for (varsymbol, short_name, unit, long_var_name, var_type_name) in TENDENCY_BUDGET_VARIABLES
+        for (term_symbol, term_short, term_long, term_type_name) in TENDENCY_BUDGET_TERMS
+            typename = Symbol(term_type_name, var_type_name, "TendencyOutput")
+            name = string(short_name, "_tend_", term_short)
+            long_name = string(long_var_name, " tendency from ", term_long)
+            field = Symbol(varsymbol, :_tend_, term_symbol, :_grid)
+            push!(specs, (typename, name, unit, long_name, field))
+        end
+    end
+    Tuple(specs)
+end
+
+for spec in TENDENCY_BUDGET_OUTPUT_SPECS
+    typename, name, unit, long_name, field = spec
+    @eval begin
+        @kwdef mutable struct $typename <: AbstractTendencyBudgetOutput
+            name::String = $name
+            unit::String = $unit
+            long_name::String = $long_name
+            dims_xyzt::NTuple{4, Bool} = (true, true, true, true)
+            missing_value::Float64 = NaN
+            compression_level::Int = 3
+            shuffle::Bool = true
+            keepbits::Int = 8
+        end
+
+        path(::$typename, simulation) =
+            simulation.diagnostic_variables.tendencies.$field
+    end
+end
+
+function output!(
+        output::NetCDFOutput,
+        variable::AbstractTendencyBudgetOutput,
+        simulation::AbstractSimulation,
+    )
+    # escape immediately after first call if variable doesn't have a time dimension
+    ~hastime(variable) && output.output_counter > 1 && return nothing
+
+    # interpolate tendency on output grid
+    tend = output.field3D
+    raw = on_architecture(CPU(), path(variable, simulation))
+    RingGrids.interpolate!(tend, raw, output.interpolator)
+
+    # convert from radius-scaled internal tendency to physical K/day
+    radius = simulation.model.planet.radius
+    tend .*= (86_400 / radius)
+
+    if hasproperty(variable, :keepbits)
+        round!(tend, variable.keepbits)
+    end
+
+    i = output.output_counter
+    indices = get_indices(i, variable)
+    output.netcdf_file[variable.name][indices...] = tend
+    return nothing
+end
+
+tendency_budget_calls = [:( $(spec[1])() ) for spec in TENDENCY_BUDGET_OUTPUT_SPECS]
+@eval TendencyBudgetOutput() = ($(tendency_budget_calls...),)
+
 # collect all in one for convenience
 DynamicsOutput() = (
     VorticityOutput(),

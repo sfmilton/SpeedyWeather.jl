@@ -74,6 +74,102 @@ $(TYPEDFIELDS)"""
     temp_tend_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
     "Specific humidity [kg/kg], grid"
     humid_tend_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Zonal wind tendency contribution from physics parameterizations [m/s], scaled by radius"
+    u_tend_physics_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Meridional wind tendency contribution from physics parameterizations [m/s], scaled by radius"
+    v_tend_physics_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Temperature tendency contribution from physics parameterizations [K/s], scaled by radius"
+    temp_tend_physics_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Specific humidity tendency contribution from physics parameterizations [kg/kg/s], scaled by radius"
+    humid_tend_physics_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Zonal wind tendency contribution from dynamics [m/s], scaled by radius"
+    u_tend_dynamics_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Meridional wind tendency contribution from dynamics [m/s], scaled by radius"
+    v_tend_dynamics_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Temperature tendency contribution from dynamics [K/s], scaled by radius"
+    temp_tend_dynamics_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Specific humidity tendency contribution from dynamics [kg/kg/s], scaled by radius"
+    humid_tend_dynamics_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Zonal wind tendency contribution from convection [m/s], scaled by radius"
+    u_tend_conv_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Meridional wind tendency contribution from convection [m/s], scaled by radius"
+    v_tend_conv_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Temperature tendency contribution from convection [K/s], scaled by radius"
+    temp_tend_conv_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Specific humidity tendency contribution from convection [kg/kg/s], scaled by radius"
+    humid_tend_conv_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Zonal wind tendency contribution from boundary-layer processes [m/s], scaled by radius"
+    u_tend_bl_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Meridional wind tendency contribution from boundary-layer processes [m/s], scaled by radius"
+    v_tend_bl_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Temperature tendency contribution from boundary-layer processes [K/s], scaled by radius"
+    temp_tend_bl_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Specific humidity tendency contribution from boundary-layer processes [kg/kg/s], scaled by radius"
+    humid_tend_bl_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Zonal wind tendency contribution from vertical diffusion [m/s], scaled by radius"
+    u_tend_vdiff_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Meridional wind tendency contribution from vertical diffusion [m/s], scaled by radius"
+    v_tend_vdiff_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Temperature tendency contribution from vertical diffusion [K/s], scaled by radius"
+    temp_tend_vdiff_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Specific humidity tendency contribution from vertical diffusion [kg/kg/s], scaled by radius"
+    humid_tend_vdiff_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Zonal wind tendency contribution from large-scale condensation [m/s], scaled by radius"
+    u_tend_lsc_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Meridional wind tendency contribution from large-scale condensation [m/s], scaled by radius"
+    v_tend_lsc_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Temperature tendency contribution from large-scale condensation [K/s], scaled by radius"
+    temp_tend_lsc_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Specific humidity tendency contribution from large-scale condensation [kg/kg/s], scaled by radius"
+    humid_tend_lsc_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Zonal wind tendency contribution from shortwave radiation [m/s], scaled by radius"
+    u_tend_sw_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Meridional wind tendency contribution from shortwave radiation [m/s], scaled by radius"
+    v_tend_sw_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Temperature tendency contribution from shortwave radiation [K/s], scaled by radius"
+    temp_tend_sw_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Specific humidity tendency contribution from shortwave radiation [kg/kg/s], scaled by radius"
+    humid_tend_sw_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Zonal wind tendency contribution from longwave radiation [m/s], scaled by radius"
+    u_tend_lw_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Meridional wind tendency contribution from longwave radiation [m/s], scaled by radius"
+    v_tend_lw_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Temperature tendency contribution from longwave radiation [K/s], scaled by radius"
+    temp_tend_lw_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Specific humidity tendency contribution from longwave radiation [kg/kg/s], scaled by radius"
+    humid_tend_lw_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Zonal wind tendency contribution from surface momentum flux [m/s], scaled by radius"
+    u_tend_smf_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Meridional wind tendency contribution from surface momentum flux [m/s], scaled by radius"
+    v_tend_smf_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Temperature tendency contribution from surface momentum flux [K/s], scaled by radius"
+    temp_tend_smf_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Specific humidity tendency contribution from surface momentum flux [kg/kg/s], scaled by radius"
+    humid_tend_smf_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Zonal wind tendency contribution from surface sensible heat flux [m/s], scaled by radius"
+    u_tend_shf_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Meridional wind tendency contribution from surface sensible heat flux [m/s], scaled by radius"
+    v_tend_shf_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Temperature tendency contribution from surface sensible heat flux [K/s], scaled by radius"
+    temp_tend_shf_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Specific humidity tendency contribution from surface sensible heat flux [kg/kg/s], scaled by radius"
+    humid_tend_shf_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Zonal wind tendency contribution from surface humidity flux [m/s], scaled by radius"
+    u_tend_shuf_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Meridional wind tendency contribution from surface humidity flux [m/s], scaled by radius"
+    v_tend_shuf_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Temperature tendency contribution from surface humidity flux [K/s], scaled by radius"
+    temp_tend_shuf_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Specific humidity tendency contribution from surface humidity flux [kg/kg/s], scaled by radius"
+    humid_tend_shuf_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Zonal wind tendency contribution from stochastic physics [m/s], scaled by radius"
+    u_tend_stoch_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Meridional wind tendency contribution from stochastic physics [m/s], scaled by radius"
+    v_tend_stoch_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Temperature tendency contribution from stochastic physics [K/s], scaled by radius"
+    temp_tend_stoch_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
+    "Specific humidity tendency contribution from stochastic physics [kg/kg/s], scaled by radius"
+    humid_tend_stoch_grid::GridVariable3D = zeros(GridVariable3D, grid, nlayers)
     "Logarith of surface pressure [Pa], grid"
     pres_tend_grid::GridVariable2D = zeros(GridVariable2D, grid)
     "Tracers [?], grid"
@@ -543,6 +639,22 @@ Set the tendencies for the barotropic model to `x`."""
 function Base.fill!(tendencies::Tendencies, x, ::Type{<:Barotropic})
     fill!(tendencies.u_tend_grid, x)
     fill!(tendencies.v_tend_grid, x)
+    for field in (
+            :u_tend_physics_grid, :v_tend_physics_grid, :temp_tend_physics_grid, :humid_tend_physics_grid,
+            :u_tend_dynamics_grid, :v_tend_dynamics_grid, :temp_tend_dynamics_grid, :humid_tend_dynamics_grid,
+            :u_tend_conv_grid, :v_tend_conv_grid, :temp_tend_conv_grid, :humid_tend_conv_grid,
+            :u_tend_bl_grid, :v_tend_bl_grid, :temp_tend_bl_grid, :humid_tend_bl_grid,
+            :u_tend_vdiff_grid, :v_tend_vdiff_grid, :temp_tend_vdiff_grid, :humid_tend_vdiff_grid,
+            :u_tend_lsc_grid, :v_tend_lsc_grid, :temp_tend_lsc_grid, :humid_tend_lsc_grid,
+            :u_tend_sw_grid, :v_tend_sw_grid, :temp_tend_sw_grid, :humid_tend_sw_grid,
+            :u_tend_lw_grid, :v_tend_lw_grid, :temp_tend_lw_grid, :humid_tend_lw_grid,
+            :u_tend_smf_grid, :v_tend_smf_grid, :temp_tend_smf_grid, :humid_tend_smf_grid,
+            :u_tend_shf_grid, :v_tend_shf_grid, :temp_tend_shf_grid, :humid_tend_shf_grid,
+            :u_tend_shuf_grid, :v_tend_shuf_grid, :temp_tend_shuf_grid, :humid_tend_shuf_grid,
+            :u_tend_stoch_grid, :v_tend_stoch_grid, :temp_tend_stoch_grid, :humid_tend_stoch_grid,
+        )
+        fill!(getfield(tendencies, field), x)
+    end
     fill!(tendencies.vor_tend, x)
 
     for tracer in values(tendencies.tracers_tend)

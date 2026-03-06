@@ -381,19 +381,59 @@ function timestep!(
     # set the tendencies back to zero for accumulation
     fill!(diagn.tendencies, 0, typeof(model))
 
+    # snapshots of tendency contributions:
+    # physics first, then dynamics increment over physics
+    u_tend_grid = diagn.tendencies.u_tend_grid
+    v_tend_grid = diagn.tendencies.v_tend_grid
+    temp_tend_grid = diagn.tendencies.temp_tend_grid
+    humid_tend_grid = diagn.tendencies.humid_tend_grid
+    u_tend_physics_grid = diagn.tendencies.u_tend_physics_grid
+    v_tend_physics_grid = diagn.tendencies.v_tend_physics_grid
+    temp_tend_physics_grid = diagn.tendencies.temp_tend_physics_grid
+    humid_tend_physics_grid = diagn.tendencies.humid_tend_physics_grid
+    u_tend_dynamics_grid = diagn.tendencies.u_tend_dynamics_grid
+    v_tend_dynamics_grid = diagn.tendencies.v_tend_dynamics_grid
+    temp_tend_dynamics_grid = diagn.tendencies.temp_tend_dynamics_grid
+    humid_tend_dynamics_grid = diagn.tendencies.humid_tend_dynamics_grid
+
     if model.physics                            # switch on/off all physics parameterizations
         # calculate all parameterizations
         parameterization_tendencies!(diagn, progn, model)
+        copyto!(u_tend_physics_grid, u_tend_grid)
+        copyto!(v_tend_physics_grid, v_tend_grid)
+        copyto!(temp_tend_physics_grid, temp_tend_grid)
+        if model isa PrimitiveWet
+            copyto!(humid_tend_physics_grid, humid_tend_grid)
+        else
+            fill!(humid_tend_physics_grid, 0)
+        end
         ocean_timestep!(progn, diagn, model)    # sea surface temperature and maybe in the future sea ice
         sea_ice_timestep!(progn, diagn, model)  # sea ice
         land_timestep!(progn, diagn, model)     # soil moisture and temperature, vegetation, maybe rivers
+    else
+        fill!(u_tend_physics_grid, 0)
+        fill!(v_tend_physics_grid, 0)
+        fill!(temp_tend_physics_grid, 0)
+        fill!(humid_tend_physics_grid, 0)
     end
 
     if model.dynamics                                               # switch on/off all dynamics
         dynamics_tendencies!(diagn, progn, lf2, model)              # dynamical core
         implicit_correction!(diagn, progn, model.implicit, model)   # semi-implicit time stepping corrections
+        u_tend_dynamics_grid .= u_tend_grid .- u_tend_physics_grid
+        v_tend_dynamics_grid .= v_tend_grid .- v_tend_physics_grid
+        temp_tend_dynamics_grid .= temp_tend_grid .- temp_tend_physics_grid
+        if model isa PrimitiveWet
+            humid_tend_dynamics_grid .= humid_tend_grid .- humid_tend_physics_grid
+        else
+            fill!(humid_tend_dynamics_grid, 0)
+        end
     else    # just transform physics tendencies to spectral space
         physics_tendencies_only!(diagn, model)
+        fill!(u_tend_dynamics_grid, 0)
+        fill!(v_tend_dynamics_grid, 0)
+        fill!(temp_tend_dynamics_grid, 0)
+        fill!(humid_tend_dynamics_grid, 0)
     end
 
     # # APPLY DIFFUSION, STEP FORWARD IN TIME, AND TRANSFORM NEW TIME STEP TO GRID

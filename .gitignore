@@ -34,6 +34,7 @@ Manifest.toml
 # no model output folders
 run_*/
 tmp_*/
+SpeedyWeather/experiments/*/
 
 # no video outputs
 *.mp4
