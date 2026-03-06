@@ -189,8 +189,15 @@ function initialize!(model::PrimitiveDry; time::DateTime = DEFAULT_DATE)
     # set the initial conditions (may overwrite variables set in initialize! ocean/land)
     initialize!(prognostic_variables, model.initial_conditions, model)
     (; clock) = prognostic_variables
-    clock.time = time       # set the current time
-    clock.start = time      # and store the start time
+
+    # Keep timestamp from restart files unless a new `time` was explicitly requested.
+    if !(model.initial_conditions isa StartFromFile) || time != DEFAULT_DATE
+        clock.time = time       # set the current time
+        clock.start = time      # and store the start time
+    end
+
+    # Use the final clock time for seasonal-cycle anchoring.
+    initialize!(model.solar_zenith, clock.time, model)
 
     # pack prognostic, diagnostic variables and model into a simulation
     return Simulation(prognostic_variables, diagnostic_variables, model)

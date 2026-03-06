@@ -156,7 +156,8 @@ function output!(
     (; nlayers) = simulation.diagnostic_variables
     T = simulation.diagnostic_variables.physics.surface_air_temperature
 
-    if !simulation.model.physics    # otherwise this has been computed already
+    # At initial output this field may still be all zeros; fall back to model-level temperature.
+    if !simulation.model.physics || all(iszero, T)
         # calculate the surface air temperature from lowest model level temperature
         # via dry adiabatic lapse rate
         T .= field_view(simulation.diagnostic_variables.grid.temp_grid, :, nlayers)

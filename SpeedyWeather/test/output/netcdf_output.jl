@@ -154,6 +154,9 @@ end
 
     # should be within ~800 to ~1200hPa
     @test all(0.8 .< mslp ./ p₀ .< 1.2)
+    mslp0 = ds["mslp"].var[:, :, 1]
+    @test all(isfinite.(mslp0))
+    @test all(0.8 .< mslp0 ./ p₀ .< 1.2)
 
     ## test u10, v10 existence
     @test haskey(ds, "u")
@@ -181,17 +184,26 @@ end
     run!(simulation, output = true; period = Day(1))
 
     initial_conditions = StartFromFile(path = tmp_output_path, id = "restart-test")
-    model_new = PrimitiveDryModel(spectral_grid; initial_conditions)
+    output_new = NetCDFOutput(spectral_grid, PrimitiveDry, path = tmp_output_path, id = "restart-test-cont")
+    model_new = PrimitiveDryModel(spectral_grid; initial_conditions, output = output_new)
     simulation_new = initialize!(model_new)
 
     progn_old = simulation.prognostic_variables
     progn_new = simulation_new.prognostic_variables
+    restart_time = progn_old.clock.time
+
+    @test progn_new.clock.time == restart_time
 
     for varname in (:vor, :div, :temp, :pres)
         var_old = getfield(progn_old, varname)
         var_new = getfield(progn_new, varname)
         @test all(var_old .== var_new)
     end
+
+    run!(simulation_new, output = true; period = Hour(6))
+    @test model_new.output.startdate == restart_time
+    ds_new = NCDataset(joinpath(model_new.output.run_path, model_new.output.filename))
+    @test ds_new["time"][1] == restart_time
 end
 
 @testset "Restart from restart file without output" begin

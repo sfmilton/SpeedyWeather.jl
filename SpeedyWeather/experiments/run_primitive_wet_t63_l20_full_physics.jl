@@ -22,6 +22,12 @@ end
 function main()
     spectral_grid = SpectralGrid(trunc = 63, nlayers = 20)
     time_stepping = Leapfrog(spectral_grid, Δt_at_T31 = Minute(20))
+
+    ic = StartFromFile(spectral_grid;
+        path = "SpeedyWeather/experiments",
+        run_folder = "run_primitive_wet_t63_l20_full_physics_0004",  # change to your finished run folder
+        filename = "restart.jld2",
+    )    
     output = NetCDFOutput(
         spectral_grid,
         PrimitiveWet,
@@ -34,8 +40,11 @@ function main()
     add!(output, SpeedyWeather.RadiationOutput()...)
     add!(output, SpeedyWeather.PrecipitationOutput()...)
     add!(output, SpeedyWeather.TendencyBudgetOutput()...)
+    add!(output, SpeedyWeather.BoundaryLayerOutput()...)  # includes tsurf, u10, v10, bld
+    add!(output, SpeedyWeather.OceanOutput()...)          # includes sst, sic
+    add!(output, SpeedyWeather.LandOutput()...)
 
-    model = PrimitiveWetModel(spectral_grid; physics = true, output, time_stepping)
+    model = PrimitiveWetModel(spectral_grid; physics = true, output, time_stepping, initial_conditions=ic)
     add!(model.callbacks, :abort_on_nan => AbortOnNaN())
     simulation = initialize!(model)
 

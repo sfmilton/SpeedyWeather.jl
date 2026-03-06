@@ -73,6 +73,9 @@ function initialize!(
         initialize!(clock, time_stepping, period)
     end
 
+    # Keep NetCDF "hours since ..." metadata aligned with the simulation start.
+    hasproperty(model.output, :startdate) && (model.output.startdate = clock.start)
+
     # OUTPUT, enable/disable output
     set!(simulation.model.output, active = output, reset_path = true)
 

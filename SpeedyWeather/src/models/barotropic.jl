@@ -99,8 +99,10 @@ function initialize!(model::Barotropic; time::DateTime = DEFAULT_DATE)
     # set the initial conditions
     initialize!(prognostic_variables, model.initial_conditions, model)
     (; clock) = prognostic_variables
-    clock.time = time       # set the current time
-    clock.start = time      # and store the start time
+    if !(model.initial_conditions isa StartFromFile) || time != DEFAULT_DATE
+        clock.time = time       # set the current time
+        clock.start = time      # and store the start time
+    end
 
     return Simulation(prognostic_variables, diagnostic_variables, model)
 end

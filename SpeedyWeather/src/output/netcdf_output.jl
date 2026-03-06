@@ -246,6 +246,9 @@ function initialize!(
     )
     output.active || return nothing             # exit immediately for no output
 
+    # Derived from simulation clock for "hours since ..." metadata.
+    output.startdate = progn.clock.start
+
     # only checked for models that have a land component
     if hasfield(typeof(model), :land) && !isnothing(model.land)
         @assert get_soil_layers(model) == size(output.field3Dland, 2) "$(size(output.field3Dland, 2)) soil layers initialized for output, but $(get_soil_layers(model)) soil layers initialized for model. Please construct NetCDFOutput with the same LandGeometry as the model."
