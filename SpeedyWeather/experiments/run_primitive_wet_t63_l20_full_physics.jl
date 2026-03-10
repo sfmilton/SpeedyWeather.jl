@@ -41,8 +41,9 @@ function main()
     add!(output, SpeedyWeather.PrecipitationOutput()...)
     add!(output, SpeedyWeather.TendencyBudgetOutput()...)
     add!(output, SpeedyWeather.BoundaryLayerOutput()...)  # includes tsurf, u10, v10, bld
-    add!(output, SpeedyWeather.OceanOutput()...)          # includes sst, sic
+    add!(output, SpeedyWeather.OceanOutput()...)          # includes sst, ssta, sic
     add!(output, SpeedyWeather.LandOutput()...)
+    add!(output, SpeedyWeather.GeopotentialOutput())
 
     model = PrimitiveWetModel(spectral_grid; physics = true, output, time_stepping, initial_conditions=ic)
     add!(model.callbacks, :abort_on_nan => AbortOnNaN())

@@ -8,6 +8,7 @@
 
     @testset for OceanModel in (
             SeasonalOceanClimatology,
+            SeasonalOceanClimatologyAnomaly,
             ConstantOceanClimatology,
             AquaPlanet,
             SlabOcean,
@@ -47,5 +48,25 @@
                 @test all(0 .<= simulation.prognostic_variables.ocean.sea_ice_concentration .<= 1)
             end
         end
+    end
+
+    @testset "Seasonal anomaly ocean modifies SST" begin
+        reference_time = DateTime(1980, 1, 15)
+
+        model_clim = PrimitiveDryModel(spectral_grid; ocean = SeasonalOceanClimatology(spectral_grid), sea_ice = nothing)
+        model_clim.feedback.verbose = false
+        simulation_clim = initialize!(model_clim, time = reference_time)
+
+        model_anom = PrimitiveDryModel(spectral_grid; ocean = SeasonalOceanClimatologyAnomaly(spectral_grid), sea_ice = nothing)
+        model_anom.feedback.verbose = false
+        simulation_anom = initialize!(model_anom, time = reference_time)
+
+        sst_clim = Array(simulation_clim.prognostic_variables.ocean.sea_surface_temperature)
+        sst_anom = Array(simulation_anom.prognostic_variables.ocean.sea_surface_temperature)
+        sst_diff = sst_anom .- sst_clim
+        finite_diff = sst_diff[isfinite.(sst_diff)]
+
+        @test !isempty(finite_diff)
+        @test maximum(abs.(finite_diff)) > 0
     end
 end

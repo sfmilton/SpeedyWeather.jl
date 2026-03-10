@@ -81,6 +81,24 @@ The time of the year is determined by the clock in `prognostic_variables.clock`
 such that `initialize!(model, time=DateTime(2000, 1, 1))` would interpolate
 the seasonal climatology onto the first of January.
 
+## Seasonal climatology + anomalies
+
+`SeasonalOceanClimatologyAnomaly` extends `SeasonalOceanClimatology` by adding a
+monthly SST anomaly file to the monthly climatology:
+
+```@example ocean
+ocean = SeasonalOceanClimatologyAnomaly(spectral_grid)
+model = PrimitiveWetModel(spectral_grid; ocean)
+simulation = initialize!(model, time=DateTime(1979, 1, 1))
+nothing # hide
+```
+
+At each ocean timestep SpeedyWeather computes
+`SST = climatology(time) + anomaly(time)` where both terms are linearly interpolated in time.
+The default anomaly file is `input_data/sst_anomaly.nc` with monthly timestamps from 1979-01 to 2013-12.
+If simulation time is outside the anomaly range, anomalies are clamped to the first/last available month
+unless `clamp_outside_range=false` is set.
+
 ## Slab ocean
 
 The most complex ocean model implemented is a slab ocean model:
